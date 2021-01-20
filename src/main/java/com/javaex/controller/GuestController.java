@@ -1,0 +1,78 @@
+package com.javaex.controller;
+
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.javaex.dao.GuestDao;
+import com.javaex.vo.GuestVo;
+
+@Controller
+@RequestMapping(value="/guest")
+public class GuestController {
+
+	//리스트
+	@RequestMapping(value="/list", method= {RequestMethod.GET, RequestMethod.POST})
+	public String list(Model model) {
+		System.out.println("리스트");
+		
+		//Dao -> 리스트 가져오기
+		GuestDao guestDao = new GuestDao();
+		List<GuestVo> guestList = guestDao.getGuestList();
+		
+		//Model - 데이터 담기
+		model.addAttribute("gList", guestList);
+		
+		return "list";
+	}
+	
+	//guest?name=김이름&password=123&content=내용작성&action=insert
+	//등록
+	@RequestMapping(value="/insert", method= {RequestMethod.GET, RequestMethod.POST})
+	public String insert(@ModelAttribute GuestVo guestVo) {
+		System.out.println("등록");
+		
+		//파라미터값 받아서 묶기 -> ModelAttribute
+		//System.out.println(guestVo); 테스트
+		
+		//Dao -> 등록
+		GuestDao guestDao = new GuestDao();
+		guestDao.guestInsert(guestVo);
+		
+		return "redirect:/guest/list";
+	}
+	
+	//삭제폼
+	@RequestMapping(value="/deleteForm", method= {RequestMethod.GET, RequestMethod.POST})
+	public String deleteForm(@RequestParam("no") int no) {
+		System.out.println("삭제폼");
+		
+		return "deleteForm";
+	}
+	
+	//delete?password=123&no=163
+	//삭제
+	@RequestMapping(value="/delete", method= {RequestMethod.GET, RequestMethod.POST})
+	public String delete(@ModelAttribute GuestVo guestVo) {
+		System.out.println("삭제");
+		System.out.println(guestVo);
+
+		//Dao -> 삭제
+		GuestDao guestDao = new GuestDao();
+		int count = guestDao.guestDelete(guestVo);
+		
+		//리턴값이 1이면 삭제, 0이면 다시입력
+		if(count == 1) {
+			return "redirect:/guest/list";
+		} else {
+			return "deleteForm";
+		}
+
+	}
+	
+}
