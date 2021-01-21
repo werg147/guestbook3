@@ -51,6 +51,7 @@ public class GuestController {
 	@RequestMapping(value="/deleteForm", method= {RequestMethod.GET, RequestMethod.POST})
 	public String deleteForm(@RequestParam("no") int no) {
 		System.out.println("삭제폼");
+		System.out.println(no);
 		
 		return "deleteForm";
 	}
@@ -58,19 +59,21 @@ public class GuestController {
 	//delete?password=123&no=163
 	//삭제
 	@RequestMapping(value="/delete", method= {RequestMethod.GET, RequestMethod.POST})
-	public String delete(@ModelAttribute GuestVo guestVo) {
+	public String delete(@ModelAttribute GuestVo guestVo, Model model) {
 		System.out.println("삭제");
-		System.out.println(guestVo);
 
 		//Dao -> 삭제
 		GuestDao guestDao = new GuestDao();
 		int count = guestDao.guestDelete(guestVo);
 		
+		//model담기
+		model.addAttribute("no", guestVo.getNo());
+		
 		//리턴값이 1이면 삭제, 0이면 다시입력
 		if(count == 1) {
 			return "redirect:/guest/list";
 		} else {
-			return "deleteForm";
+			return "redirect:/guest/deleteForm";
 		}
 
 	}
